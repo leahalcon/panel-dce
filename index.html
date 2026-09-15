@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Panel DCE</title>
+<meta name="description" content="Panel de gestión de la División Capacitación y Entrenamiento (DTOCE): calendario semanal y tareas pendientes.">
+<meta name="application-name" content="Panel DCE">
+<meta name="apple-mobile-web-app-title" content="Panel DCE">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#24507F" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#11171E" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style id="dce-style">
+:root{
+  color-scheme:light dark;
+  --ground:#EDF0F3; --surface:#FFFFFF; --surface-2:#F6F8FA; --ink:#16202B; --muted:#5C6B7A; --line:#D3DAE1; --line-strong:#B6C0CA;
+  --accent:#24507F; --accent-ink:#FFFFFF; --accent-soft:#E3ECF6;
+  --cap:#B8741C; --cap-soft:#F7ECDA; --adm:#24507F; --adm-soft:#E3ECF6; --gua:#6D5F9C; --gua-soft:#ECE8F6; --otr:#6E7C8A; --otr-soft:#E9EDF0;
+  --danger:#B42318; --danger-soft:#FBE7E4; --ok:#227A4E; --ok-soft:#E2F2E9; --warn:#B8741C;
+  --today:#FFF6E3; --shadow:0 10px 30px rgba(22,32,43,.18);
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-head:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#11171E; --surface:#1A222B; --surface-2:#202A34; --ink:#E7EDF3; --muted:#9AA8B6; --line:#2B3641; --line-strong:#3D4A57;
+    --accent:#7FB0E6; --accent-ink:#0F1A26; --accent-soft:#213448;
+    --cap:#E0A04A; --cap-soft:#3A2D18; --adm:#7FB0E6; --adm-soft:#213448; --gua:#B3A5E6; --gua-soft:#2C2740; --otr:#9AA8B6; --otr-soft:#26303A;
+    --danger:#F08A7E; --danger-soft:#40201C; --ok:#6CC495; --ok-soft:#1C3527; --warn:#E0A04A;
+    --today:#2E2A1E; --shadow:0 10px 30px rgba(0,0,0,.5);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#11171E; --surface:#1A222B; --surface-2:#202A34; --ink:#E7EDF3; --muted:#9AA8B6; --line:#2B3641; --line-strong:#3D4A57;
+  --accent:#7FB0E6; --accent-ink:#0F1A26; --accent-soft:#213448;
+  --cap:#E0A04A; --cap-soft:#3A2D18; --adm:#7FB0E6; --adm-soft:#213448; --gua:#B3A5E6; --gua-soft:#2C2740; --otr:#9AA8B6; --otr-soft:#26303A;
+  --danger:#F08A7E; --danger-soft:#40201C; --ok:#6CC495; --ok-soft:#1C3527; --warn:#E0A04A;
+  --today:#2E2A1E; --shadow:0 10px 30px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html{margin:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--font-body);font-size:14px;line-height:1.45;padding-inline:16px;padding-block:0 40px;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1280px;margin:0 auto}
+
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;padding-block:20px 14px;border-bottom:2px solid var(--ink)}
+.brand .eyebrow{font-family:var(--font-head);font-weight:600;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.brand h1{font-family:var(--font-head);font-weight:700;font-size:30px;line-height:1.05;margin:2px 0 0;text-wrap:balance}
+.brand h1 small{font-weight:500;color:var(--muted);font-size:18px;margin-left:8px}
+.stats{display:flex;gap:18px;flex-wrap:wrap}
+.stat{display:flex;flex-direction:column;min-width:74px}
+.stat b{font-family:var(--font-head);font-size:24px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.stat span{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.stat.alert b{color:var(--danger)}
+
+.notice{margin-top:12px;padding:8px 12px;border-radius:6px;background:var(--adm-soft);color:var(--ink);font-size:13px;border:1px solid var(--line);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.notice b{font-weight:600}
+
+.sec{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:26px 0 10px}
+.sec h2{font-family:var(--font-head);font-weight:600;font-size:20px;margin:0;letter-spacing:.01em}
+.sec h2 .sub{font-family:var(--font-body);font-weight:400;font-size:13px;color:var(--muted);margin-left:10px}
+.weeknav{display:flex;align-items:center;gap:6px}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-strong);background:var(--surface);border-radius:6px;padding:6px 12px;font-weight:500;line-height:1.2;cursor:pointer}
+.btn:hover{background:var(--surface-2)}
+.btn.icon{padding:6px 9px;font-family:var(--font-head);font-weight:700}
+
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.day{background:var(--surface);border:1px solid var(--line);border-radius:8px;display:flex;flex-direction:column;min-height:150px}
+.day.today{background:var(--today);border-color:var(--warn)}
+.day.past{opacity:.78}
+.dayhead{display:flex;align-items:baseline;gap:8px;padding:8px 10px 6px;border-bottom:1px solid var(--line)}
+.dayhead .dn{font-family:var(--font-head);font-weight:600;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.day.today .dayhead .dn{color:var(--warn)}
+.dayhead .dd{font-family:var(--font-head);font-weight:700;font-size:22px;line-height:1;font-variant-numeric:tabular-nums}
+.evs{display:flex;flex-direction:column;gap:6px;padding:8px}
+.ev{border-left:4px solid var(--otr);background:var(--otr-soft);border-radius:4px;padding:6px 8px;display:flex;flex-direction:column;gap:1px}
+.ev.cap{border-color:var(--cap);background:var(--cap-soft)}
+.ev.adm{border-color:var(--adm);background:var(--adm-soft)}
+.ev.gua{border-color:var(--gua);background:var(--gua-soft)}
+.ev .t{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.ev .n{font-weight:600;font-size:13px;line-height:1.25}
+.ev .m{font-size:11.5px;color:var(--muted);line-height:1.3}
+.empty{color:var(--muted);font-size:12px;padding:6px 8px;font-style:italic}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+
+.filters{display:flex;align-items:center;gap:10px 16px;flex-wrap:wrap;font-size:13px}
+.filters select{padding:4px 8px;border:1px solid var(--line-strong);border-radius:6px;background:var(--surface)}
+.filters label{display:inline-flex;align-items:center;gap:6px}
+.tasks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.panel-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.panel-h h3{margin:0;font-family:var(--font-head);font-weight:600;font-size:16px;display:flex;align-items:center;gap:8px}
+.panel-h h3 i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.panel.cap .panel-h h3 i{background:var(--cap)}
+.panel.adm .panel-h h3 i{background:var(--adm)}
+.count{font-family:var(--font-head);font-weight:600;color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.tl{list-style:none;margin:0;padding:0}
+.task{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;padding:10px 12px;border-bottom:1px solid var(--line);border-left:4px solid transparent}
+.task:last-child{border-bottom:0}
+.task.p-alta{border-left-color:var(--danger)}
+.task.p-media{border-left-color:var(--warn)}
+.task.p-baja{border-left-color:var(--line-strong)}
+.task.done{opacity:.55}
+.task.done .title{text-decoration:line-through}
+.chk{width:20px;height:20px;border:2px solid var(--line-strong);border-radius:4px;background:var(--surface);display:grid;place-items:center;margin-top:1px}
+.chk.on{background:var(--ok);border-color:var(--ok);color:#fff}
+.chk.half{border-color:var(--accent);background:linear-gradient(135deg,var(--accent) 50%,transparent 50%)}
+.chk svg{width:12px;height:12px}
+.tb{min-width:0}
+.tb .title{font-weight:600;font-size:14px;line-height:1.3}
+.meta{display:flex;flex-wrap:wrap;gap:4px 8px;margin-top:4px;font-size:12px;color:var(--muted)}
+.meta .who{font-weight:500;color:var(--ink)}
+.meta .due{font-variant-numeric:tabular-nums}
+.meta .due.over{color:var(--danger);font-weight:600}
+.meta .due.soon{color:var(--warn);font-weight:600}
+.meta .st{padding:0 6px;border-radius:10px;background:var(--surface-2);border:1px solid var(--line)}
+.meta .st.curso{background:var(--accent-soft);border-color:transparent;color:var(--accent)}
+.tb .notes{font-size:12.5px;color:var(--muted);margin-top:3px;white-space:pre-wrap}
+.panel .empty{padding:14px 12px}
+
+.foot{margin-top:30px;padding-top:14px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+
+@media (max-width:900px){
+  .tasks{grid-template-columns:1fr}
+  .cal{grid-template-columns:1fr;gap:6px}
+  .day{min-height:0}
+  .day.collapsed .evs{display:none}
+  .dayhead{padding:7px 10px;cursor:pointer}
+  .dayhead .dd{font-size:18px}
+  .brand h1{font-size:24px}
+  .stat b{font-size:20px}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap" id="app"></div>
+
+<script id="dce-state" type="application/json">{"generatedAt": "2026-09-14", "members": ["Foschi", "Romero", "Garanzini", "Monzón", "Gauto Cabana", "Morali", "Lopardo", "Seia"], "events": [{"id": "gc1", "date": "2026-09-09", "start": "", "end": "", "allDay": true, "title": "CAPACITACION PATRULLAJE DE EMERGENCIA", "type": "cap", "place": "Centro Argentino De Seguridad", "who": "", "notes": ""}, {"id": "gc2", "date": "2026-09-14", "start": "", "end": "", "allDay": true, "title": "CAPACITACION ANILLO DIGITAL", "type": "cap", "place": "Centro Argentino De Seguridad", "who": "", "notes": ""}, {"id": "gc3", "date": "2026-09-16", "start": "", "end": "", "allDay": true, "title": "CAPACITACION PATRULLAJE DE EMERGENCIA", "type": "cap", "place": "Centro Argentino De Seguridad", "who": "", "notes": ""}, {"id": "gc4", "date": "2026-09-21", "start": "", "end": "", "allDay": true, "title": "CAPACITACION ANILLO DIGITAL", "type": "cap", "place": "Centro Argentino De Seguridad", "who": "", "notes": ""}, {"id": "gc5", "date": "2026-09-22", "start": "09:00", "end": "14:00", "allDay": false, "title": "Inicio capacitación DOE – Jornada 1", "type": "cap", "place": "CAS", "who": "", "notes": ""}, {"id": "gc6", "date": "2026-09-23", "start": "", "end": "", "allDay": true, "title": "CAPACITACION PATRULLAJE DE EMERGENCIA", "type": "cap", "place": "Centro Argentino De Seguridad", "who": "", "notes": ""}, {"id": "gc7", "date": "2026-09-28", "start": "", "end": "", "allDay": true, "title": "CAPACITACION ANILLO DIGITAL", "type": "cap", "place": "Centro Argentino De Seguridad", "who": "", "notes": ""}, {"id": "gc8", "date": "2026-09-30", "start": "", "end": "", "allDay": true, "title": "CAPACITACION PATRULLAJE DE EMERGENCIA", "type": "cap", "place": "Centro Argentino De Seguridad", "who": "", "notes": ""}, {"id": "gc9", "date": "2026-10-05", "start": "", "end": "", "allDay": true, "title": "CAPACITACION ANILLO DIGITAL", "type": "cap", "place": "Centro Argentino De Seguridad", "who": "", "notes": ""}, {"id": "gc10", "date": "2026-10-07", "start": "", "end": "", "allDay": true, "title": "CAPACITACION PATRULLAJE DE EMERGENCIA", "type": "cap", "place": "Centro Argentino De Seguridad", "who": "", "notes": ""}, {"id": "gc11", "date": "2026-10-12", "start": "", "end": "", "allDay": true, "title": "CAPACITACION ANILLO DIGITAL", "type": "cap", "place": "Centro Argentino De Seguridad", "who": "", "notes": ""}, {"id": "gc12", "date": "2026-10-14", "start": "", "end": "", "allDay": true, "title": "CAPACITACION PATRULLAJE DE EMERGENCIA", "type": "cap", "place": "Centro Argentino De Seguridad", "who": "", "notes": ""}, {"id": "gc13", "date": "2026-10-19", "start": "", "end": "", "allDay": true, "title": "CAPACITACION ANILLO DIGITAL", "type": "cap", "place": "Centro Argentino De Seguridad", "who": "", "notes": ""}, {"id": "gc14", "date": "2026-10-21", "start": "", "end": "", "allDay": true, "title": "CAPACITACION PATRULLAJE DE EMERGENCIA", "type": "cap", "place": "Centro Argentino De Seguridad", "who": "", "notes": ""}, {"id": "gc15", "date": "2026-10-26", "start": "", "end": "", "allDay": true, "title": "CAPACITACION ANILLO DIGITAL", "type": "cap", "place": "Centro Argentino De Seguridad", "who": "", "notes": ""}, {"id": "gc16", "date": "2026-10-28", "start": "", "end": "", "allDay": true, "title": "CAPACITACION PATRULLAJE DE EMERGENCIA", "type": "cap", "place": "Centro Argentino De Seguridad", "who": "", "notes": ""}, {"id": "gc17", "date": "2026-11-02", "start": "", "end": "", "allDay": true, "title": "CAPACITACION ANILLO DIGITAL", "type": "cap", "place": "Centro Argentino De Seguridad", "who": "", "notes": ""}, {"id": "gc18", "date": "2026-11-04", "start": "", "end": "", "allDay": true, "title": "CAPACITACION PATRULLAJE DE EMERGENCIA", "type": "cap", "place": "Centro Argentino De Seguridad", "who": "", "notes": ""}], "tasks": [{"id": "t1", "cat": "cap", "title": "Confirmar con la DOE las fechas de las 30 jornadas en el CAS y cargarlas en el calendario", "who": "Foschi", "due": "", "prio": "alta", "status": "curso", "notes": "5 grupos de 20 × 6 jornadas, 09:00–14:00. Inicio confirmado: martes 22/09; faltan las fechas restantes."}, {"id": "t2", "cat": "cap", "title": "Confirmar con el CAS el ángulo mínimo para tiro a 1–2 m (rebote)", "who": "Foschi", "due": "", "prio": "alta", "status": "hecha", "notes": "Ejercicios III y IV de la jornada 2 (retención)."}, {"id": "t3", "cat": "cap", "title": "Confirmar con el CAS la disponibilidad de vehículo o carrocería en la línea", "who": "Foschi", "due": "", "prio": "alta", "status": "hecha", "notes": "Jornada 5: sospechoso en vehículo y recorrido integrador."}, {"id": "t4", "cat": "cap", "title": "Definir el nombre definitivo de la jornada 4", "who": "Foschi", "due": "", "prio": "media", "status": "hecha", "notes": "Provisorio: Amenaza a distancia y decisión de disparo."}, {"id": "t5", "cat": "cap", "title": "Probar el circuito de escaneo y análisis de las hojas de diagnóstico", "who": "", "due": "", "prio": "media", "status": "hecha", "notes": "Agregar el casillero MANO (D/Z) a la hoja A4."}, {"id": "t6", "cat": "cap", "title": "Definir dotación de instructores para correr E4 en paralelo con E3 (evaluador fijo)", "who": "", "due": "", "prio": "media", "status": "hecha", "notes": "Jornada 6, evaluatorio."}, {"id": "t7", "cat": "cap", "title": "Preparar la logística por jornada: 1.400 cartuchos 9 mm, 20 hojas A4 de diagnóstico, 14 blancos FBI, 1 rollo de cinta de papel", "who": "", "due": "", "prio": "media", "status": "hecha", "notes": ""}, {"id": "t8", "cat": "cap", "title": "Preparar la dotación única de blancos y elementos del curso", "who": "", "due": "", "prio": "media", "status": "hecha", "notes": "7 NO SHOOT, 7+7 alfanuméricos, 7 rehén, 6 reducidos, mango de 3,60 m, 7 tambores, 5 réplicas airsoft con gafas y máscaras, 40 cartuchos de instrucción, 2 cronómetros."}, {"id": "t9", "cat": "cap", "title": "Después de cada jornada: escanear las hojas de diagnóstico, cargar la planilla de la base y hacer el análisis por alumno", "who": "Foschi", "due": "", "prio": "media", "status": "pend", "notes": "Se repite en cada una de las 30 jornadas."}]}</script>
+
+<script id="dce-app">
+(function(){
+"use strict";
+const $ = (s, el) => (el || document).querySelector(s);
+const DAYS = ["lun","mar","mié","jue","vie","sáb","dom"];
+const DAYS_LONG = ["lunes","martes","miércoles","jueves","viernes","sábado","domingo"];
+const MONTHS = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+const PRIOS = {alta:"Alta", media:"Media", baja:"Baja"};
+const STATUS = {pend:"Pendiente", curso:"En curso", hecha:"Hecha"};
+
+const state = JSON.parse($("#dce-state").textContent);
+let weekOffset = 0;
+let filterWho = "";
+let hideDone = false;
+
+const pad = n => String(n).padStart(2, "0");
+const iso = d => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+const parse = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+const todayIso = () => iso(new Date());
+function mondayOf(d) { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); const wd = (x.getDay() + 6) % 7; x.setDate(x.getDate() - wd); return x; }
+function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
+function fmtLong(s) { const d = parse(s); return DAYS_LONG[(d.getDay() + 6) % 7] + " " + d.getDate() + " de " + MONTHS[d.getMonth()]; }
+function fmtShort(s) { const d = parse(s); return pad(d.getDate()) + "/" + pad(d.getMonth() + 1); }
+function fmtGenerated(s) { const d = parse(s); return pad(d.getDate()) + "/" + pad(d.getMonth() + 1) + "/" + d.getFullYear(); }
+function weekLabel(mon) {
+  const sun = addDays(mon, 6);
+  if (mon.getMonth() === sun.getMonth()) return "Semana del " + mon.getDate() + " al " + sun.getDate() + " de " + MONTHS[mon.getMonth()] + " de " + sun.getFullYear();
+  return "Semana del " + mon.getDate() + " de " + MONTHS[mon.getMonth()] + " al " + sun.getDate() + " de " + MONTHS[sun.getMonth()] + " de " + sun.getFullYear();
+}
+function daysUntil(s) { const t = parse(todayIso()), d = parse(s); return Math.round((d - t) / 86400000); }
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function render() {
+  const app = $("#app");
+  const mon = addDays(mondayOf(new Date()), weekOffset * 7);
+  const today = todayIso();
+  const weekDays = Array.from({length: 7}, (_, i) => iso(addDays(mon, i)));
+  const weekEvents = state.events.filter(e => weekDays.includes(e.date));
+  const pending = state.tasks.filter(t => t.status !== "hecha");
+  const overdue = pending.filter(t => t.due && daysUntil(t.due) < 0);
+
+  const cal = weekDays.map((d, i) => {
+    const evs = weekEvents.filter(e => e.date === d).sort((a, b) => (a.start || "").localeCompare(b.start || ""));
+    const dd = parse(d);
+    const cls = "day" + (d === today ? " today" : "") + (d < today ? " past" : "") + (evs.length ? "" : " collapsed");
+    return '<section class="' + cls + '" aria-label="' + esc(fmtLong(d)) + '">' +
+      '<div class="dayhead" data-daytoggle><span class="dn">' + DAYS[i] + '</span><span class="dd">' + dd.getDate() + '</span></div><div class="evs">' +
+      (evs.length ? evs.map(e =>
+        '<div class="ev ' + esc(e.type) + '">' +
+          '<span class="t">' + (e.allDay ? "Todo el día" : esc(e.start || "") + (e.end ? "–" + esc(e.end) : "")) + '</span>' +
+          '<span class="n">' + esc(e.title) + '</span>' +
+          ((e.place || e.who) ? '<span class="m">' + esc([e.place, e.who].filter(Boolean).join(" · ")) + '</span>' : "") +
+        '</div>').join("") : '<div class="empty">Sin actividades</div>') +
+      '</div></section>';
+  }).join("");
+
+  const memberOpts = ['<option value="">Todos los responsables</option>'].concat(state.members.map(m => '<option value="' + esc(m) + '"' + (m === filterWho ? " selected" : "") + '>' + esc(m) + '</option>')).join("");
+
+  app.innerHTML =
+    '<header class="top"><div class="brand"><div class="eyebrow">DTOCE · Policía de la Ciudad</div>' +
+    '<h1>División Capacitación y Entrenamiento <small>Panel de gestión</small></h1></div>' +
+    '<div class="stats">' +
+    '<div class="stat"><b>' + weekEvents.length + '</b><span>actividades esta semana</span></div>' +
+    '<div class="stat"><b>' + pending.length + '</b><span>tareas pendientes</span></div>' +
+    '<div class="stat' + (overdue.length ? " alert" : "") + '"><b>' + overdue.length + '</b><span>vencidas</span></div>' +
+    '</div></header>' +
+    '<div class="notice">Vista pública de solo lectura, sin necesidad de cuenta. Para cargar o modificar actividades y tareas, hablá con Foschi. <b>Datos al ' + fmtGenerated(state.generatedAt) + '.</b></div>' +
+
+    '<div class="sec"><h2>' + esc(weekLabel(mon)) + (weekOffset === 0 ? '<span class="sub">semana actual</span>' : "") + '</h2>' +
+    '<div class="weeknav"><button class="btn icon" type="button" data-week="-1" aria-label="Semana anterior">‹</button>' +
+    '<button class="btn" type="button" data-week="0">Hoy</button>' +
+    '<button class="btn icon" type="button" data-week="1" aria-label="Semana siguiente">›</button>' +
+    '</div></div>' +
+    '<div class="cal">' + cal + '</div>' +
+    '<div class="legend"><span><i style="background:var(--cap)"></i>Capacitación</span><span><i style="background:var(--adm)"></i>Administrativa</span><span><i style="background:var(--gua)"></i>Guardia / licencia</span><span><i style="background:var(--otr)"></i>Otro</span></div>' +
+
+    '<div class="sec"><h2>Tareas pendientes</h2><div class="filters">' +
+    '<select id="f-who" aria-label="Filtrar por responsable">' + memberOpts + '</select>' +
+    '<label><input type="checkbox" id="f-done"' + (hideDone ? " checked" : "") + '> Ocultar hechas</label>' +
+    '</div></div>' +
+    '<div class="tasks">' + renderPanel("cap", "Jornadas de capacitación") + renderPanel("adm", "Cuestiones administrativas") + '</div>' +
+    '<div class="foot">Panel de solo lectura de la División Capacitación y Entrenamiento (DTOCE). Se actualiza a pedido; para cambios, coordinar con Foschi por el grupo de WhatsApp de la División.</div>';
+}
+
+function renderPanel(cat, title) {
+  const order = {alta: 0, media: 1, baja: 2};
+  let list = state.tasks.filter(t => t.cat === cat);
+  if (filterWho) list = list.filter(t => t.who === filterWho);
+  const open = list.filter(t => t.status !== "hecha").length;
+  if (hideDone) list = list.filter(t => t.status !== "hecha");
+  list.sort((a, b) => {
+    const da = a.status === "hecha", db = b.status === "hecha";
+    if (da !== db) return da ? 1 : -1;
+    if (a.due !== b.due) { if (!a.due) return 1; if (!b.due) return -1; return a.due.localeCompare(b.due); }
+    return (order[a.prio] ?? 1) - (order[b.prio] ?? 1);
+  });
+  const rows = list.map(t => {
+    let dueHtml = "";
+    if (t.due) {
+      const n = daysUntil(t.due);
+      let cls = "due", txt = fmtShort(t.due);
+      if (t.status !== "hecha") {
+        if (n < 0) { cls += " over"; txt = "Venció " + txt; }
+        else if (n === 0) { cls += " soon"; txt = "Vence hoy"; }
+        else if (n <= 3) { cls += " soon"; txt = "Vence " + txt; }
+        else txt = "Vence " + txt;
+      }
+      dueHtml = '<span class="' + cls + '">' + txt + '</span>';
+    }
+    const chk = t.status === "hecha" ? "on" : (t.status === "curso" ? "half" : "");
+    return '<li class="task p-' + esc(t.prio) + (t.status === "hecha" ? " done" : "") + '">' +
+      '<span class="chk ' + chk + '" title="' + STATUS[t.status] + '">' + (t.status === "hecha" ? '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 6.5l2.6 2.5L10 3.5"/></svg>' : "") + '</span>' +
+      '<div class="tb"><span class="title">' + esc(t.title) + '</span>' +
+      '<div class="meta">' + (t.who ? '<span class="who">' + esc(t.who) + '</span>' : '<span>Sin asignar</span>') + dueHtml +
+      '<span class="st ' + esc(t.status) + '">' + STATUS[t.status] + '</span><span>Prioridad ' + (PRIOS[t.prio] || "").toLowerCase() + '</span></div>' +
+      (t.notes ? '<div class="notes">' + esc(t.notes) + '</div>' : "") + '</div>' +
+      '</li>';
+  }).join("");
+  return '<div class="panel ' + cat + '"><div class="panel-h"><h3><i></i>' + title + '<span class="count">' + open + ' abiertas</span></h3></div>' +
+    (rows ? '<ul class="tl">' + rows + '</ul>' : '<div class="empty">No hay tareas cargadas en este bloque.</div>') + '</div>';
+}
+
+document.addEventListener("click", ev => {
+  const b = ev.target.closest("[data-week],[data-daytoggle]");
+  if (!b) return;
+  if (b.dataset.week !== undefined) {
+    weekOffset = b.dataset.week === "0" ? 0 : weekOffset + Number(b.dataset.week);
+    render(); return;
+  }
+  if (b.dataset.daytoggle !== undefined && window.matchMedia("(max-width:900px)").matches) {
+    b.parentElement.classList.toggle("collapsed");
+  }
+});
+document.addEventListener("change", ev => {
+  if (ev.target.id === "f-who") { filterWho = ev.target.value; render(); }
+  if (ev.target.id === "f-done") { hideDone = ev.target.checked; render(); }
+});
+
+render();
+})();
+</script>
+
+</body>
+</html>
