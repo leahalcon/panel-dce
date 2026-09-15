@@ -34,7 +34,7 @@ def norm(s):
 
 def classify(title):
     t = norm(title)
-    if re.search(r"licencia|guardia|franco|vacacion|carpeta medica|adicional", t):
+    if re.search(r"licencia|\blao\b|guardia|franco|vacacion|carpeta medica|adicional", t):
         return "gua"
     if re.search(r"capacit|curso|jornada|instrucc|tiro|entrenam|examen|evaluac|practica|clase", t):
         return "cap"
